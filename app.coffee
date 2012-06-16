@@ -6,23 +6,26 @@ class Diode
 		@mout = new @midi.output
 		@min = new @midi.input
 
-		@min.openPort 0
-
-
-
-		[0...@mout.getPortCount()].map (i)=>
-			console.log @mout.getPortName(i)
-
-		console.log @mout.openPort(0);
-
-
-		@min.on 'message', (delta,msg) => 
-			console.log msg
-			@mout.sendMessage([144,msg[1],63]);#16*3+3
-
 		process.on 'exit', =>
 			@mout.closePort()
 			@min.closePort()
+
+		@min.openPort 0
+
+		[0...@mout.getPortCount()].map (i)=>
+			console.log @mout.getPortName(i)
+		console.log @mout.openPort(0);
+
+		@currentMode = new Snake this
+
+		@min.on 'message', (delta,msg) => 
+			x = msg[1]%16
+			y = parseInt (msg[1]/16)
+			@currentMode.press x,y
+			
+
+		
+
 
 
 		t = 0
@@ -42,7 +45,6 @@ class Diode
 
 
 		random = =>
-			t++
 			for i in [0...64]
 				x = (i%8)
 				y = parseInt (i/8)
@@ -51,12 +53,41 @@ class Diode
 				@mout.sendMessage [144,pos,color]
 
 
+		clear = =>
+			for i in [0...64]
+				x = (i%8)
+				y = parseInt (i/8)
+				@set x,y,0,0
+
+
+		clear()
 		#setInterval random, 1
 
 
 	xy2i: (x,y) -> 16 * (y%8) + x
 	cRange: (c) -> parseInt Math.min( Math.max( 0,c ), 3 )
 	color: (red,green) -> 0b001100 + @cRange(red) + @cRange(green)*8
+
+	set: (x,y,r,g) ->
+		@mout.sendMessage [144,@xy2i(x,y),@color(r,g)]
+
+
+
+class Mode 
+	constructor: (@diode) ->
+	set: (args...) -> @diode.set args...
+
+class Basic extends Mode
+	press: (x,y) ->
+		@set x,y,3,3
+		setTimeout (=> @set x,y,0,3), 300
+		setTimeout (=> @set x,y,0,0), 600
+
+class Snake extends Mode
+	press: (x,y) ->
+		@set x,y,3,3
+		setTimeout (=> @set x,y,0,3), 300
+		setTimeout (=> @set x,y,0,0), 600
 
 
 
