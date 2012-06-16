@@ -1,5 +1,9 @@
 #rad
 
+#utils
+array = (w,h,v) ->
+	[0...w].map -> [0...h].map -> v
+
 class Diode
 	constructor: ->
 		@midi = require 'midi'
@@ -16,7 +20,7 @@ class Diode
 			console.log @mout.getPortName(i)
 		console.log @mout.openPort(0);
 
-		@currentMode = new Snake this
+		@currentMode = new Memory this
 
 		@min.on 'message', (delta,msg) => 
 			x = msg[1]%16
@@ -83,7 +87,10 @@ class Basic extends Mode
 		setTimeout (=> @set x,y,0,3), 300
 		setTimeout (=> @set x,y,0,0), 600
 
-class Snake extends Mode
+class Memory extends Mode
+	constructor: ->
+		@d = array 8,8,0
+
 	press: (x,y) ->
 		@set x,y,3,3
 		setTimeout (=> @set x,y,0,3), 300
