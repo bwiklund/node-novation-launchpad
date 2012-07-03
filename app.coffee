@@ -1,88 +1,88 @@
 #!/usr/bin/env coffee
 
 class Diode
-	constructor: ->
-		@connectMidiPorts()
-		@clear()
-		setInterval @pulse, 1
+  constructor: ->
+    @connectMidiPorts()
+    @clear()
+    setInterval @pulse, 1
 
 
-	connectMidiPorts: ->
-		@midi = require 'midi'
-		@midiOut = new @midi.output
-		@midiIn = new @midi.input
+  connectMidiPorts: ->
+    @midi = require 'midi'
+    @midiOut = new @midi.output
+    @midiIn = new @midi.input
 
-		process.on 'exit', =>
-			@clear()
-			@midiOut.closePort()
-			@midiIn.closePort()
+    process.on 'exit', =>
+      @clear()
+      @midiOut.closePort()
+      @midiIn.closePort()
 
-		@midiIn.openPort 0
-		@midiIn.on 'message', (delta,msg) => 
-			x = msg[1]%16
-			y = parseInt (msg[1]/16)
-			if msg[2] != 0
-				@onButtonDown(x,y)
+    @midiIn.openPort 0
+    @midiIn.on 'message', (delta,msg) => 
+      x = msg[1]%16
+      y = parseInt (msg[1]/16)
+      if msg[2] != 0
+        @onButtonDown(x,y)
 
-		for i in [0...@midiOut.getPortCount()]
-			console.log "Port #{i}: " + @midiOut.getPortName(i)
+    for i in [0...@midiOut.getPortCount()]
+      console.log "Port #{i}: " + @midiOut.getPortName(i)
 
-		#TODO: handle multiple midi ports and choose the right one
-		@midiOut.openPort(0);
-
-
-	onButtonDown: (x,y) ->
-		console.log "#{x} x #{y} pressed"
-		#todo: something neat
-		#@currentMode.press x,y,y*8+x
+    #TODO: handle multiple midi ports and choose the right one
+    @midiOut.openPort(0);
 
 
-	### some animation tests ###
-
-	# animated glowing thing
-	pulse: =>
-		@t ?= 0
-		@t++
-		for x in [0...8]
-			for y in [0...8]
-				color = @color parseInt(Math.random()*4), parseInt(Math.random()*4)
-				dist = Math.sqrt( Math.pow(3.5-x,2) + Math.pow(3.5-y,2) )
-				red = 4-dist / ( Math.sin(@t/2) + 1)
-				green = dist / ( Math.sin(@t/2) + 2)
-				color = @color red,green
-
-				pos = @xy2i x,y
-				@midiOut.sendMessage [144,pos,color]
+  onButtonDown: (x,y) ->
+    console.log "#{x} x #{y} pressed"
+    #todo: something neat
+    #@currentMode.press x,y,y*8+x
 
 
-	# random noise pattern
-	random: =>
-		for x in [0...8]
-			for y in [0...8]
-				color = @color parseInt(Math.random()*4), parseInt(Math.random()*4)
-				pos = @xy2i x,y
-				@midiOut.sendMessage [144,pos,color]
+  ### some animation tests ###
+
+  # animated glowing thing
+  pulse: =>
+    @t ?= 0
+    @t++
+    for x in [0...8]
+      for y in [0...8]
+        color = @color parseInt(Math.random()*4), parseInt(Math.random()*4)
+        dist = Math.sqrt( Math.pow(3.5-x,2) + Math.pow(3.5-y,2) )
+        red = 4-dist / ( Math.sin(@t/2) + 1)
+        green = dist / ( Math.sin(@t/2) + 2)
+        color = @color red,green
+
+        pos = @xy2i x,y
+        @midiOut.sendMessage [144,pos,color]
 
 
-	# clear the screen
-	clear: =>
-		for x in [0...8]
-			for y in [0...8]
-				@set x,y,0,0
+  # random noise pattern
+  random: =>
+    for x in [0...8]
+      for y in [0...8]
+        color = @color parseInt(Math.random()*4), parseInt(Math.random()*4)
+        pos = @xy2i x,y
+        @midiOut.sendMessage [144,pos,color]
 
 
-	# convert XY coordinate to the midi index needed
-	xy2i: (x,y) -> 16 * (y%8) + x
+  # clear the screen
+  clear: =>
+    for x in [0...8]
+      for y in [0...8]
+        @set x,y,0,0
 
-	# clamp a number into the int range needed for lighting up pixels
-	cRange: (c) -> parseInt Math.min( Math.max( 0,c ), 3 )
 
-	# get a color code
-	color: (red,green) -> 0b001100 + @cRange(red) + @cRange(green)*8
+  # convert XY coordinate to the midi index needed
+  xy2i: (x,y) -> 16 * (y%8) + x
 
-	# set a pixel on the board
-	set: (x,y,r,g) ->
-		@midiOut.sendMessage [144,@xy2i(x,y),@color(r,g)]
+  # clamp a number into the int range needed for lighting up pixels
+  cRange: (c) -> parseInt Math.min( Math.max( 0,c ), 3 )
+
+  # get a color code
+  color: (red,green) -> 0b001100 + @cRange(red) + @cRange(green)*8
+
+  # set a pixel on the board
+  set: (x,y,r,g) ->
+    @midiOut.sendMessage [144,@xy2i(x,y),@color(r,g)]
 
 
 
