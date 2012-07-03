@@ -23,6 +23,8 @@ class Diode
       y = parseInt (msg[1]/16)
       if msg[2] != 0
         @onButtonDown(x,y)
+      else 
+        @onButtonUp(x,y)
 
     for i in [0...@midiOut.getPortCount()]
       console.log "Port #{i}: " + @midiOut.getPortName(i)
@@ -33,8 +35,9 @@ class Diode
 
   onButtonDown: (x,y) ->
     console.log "#{x} x #{y} pressed"
-    #todo: something neat
-    #@currentMode.press x,y,y*8+x
+  
+  onButtonUp: (x,y) ->
+    console.log "#{x} x #{y} released"
 
 
   ### some animation tests ###
