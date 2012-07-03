@@ -1,0 +1,41 @@
+
+class Mode 
+	constructor: (@diode) ->
+	set: (args...) -> @diode.set args...
+
+class Basic extends Mode
+	press: (x,y) ->
+		@set x,y,3,3
+		setTimeout (=> @set x,y,0,3), 300
+		setTimeout (=> @set x,y,0,0), 600
+
+class Memory extends Mode
+	constructor: (@diode)->
+		@pendingCMD = ""
+		@pattern = "100000001"
+
+		@check = "100000001"
+
+		if new RegExp(@pattern).test @check
+			console.log "MATCH"
+
+	press: (x,y,i) ->
+		@set x,y,3,3
+
+		cmds = [0...64].map -> null
+		cmds[0...8] = "cd,ls,cp,mv".split ","
+		cmds[0] = "exit"
+		cmds[8] = "git"
+		cmds[9] = "add"
+		cmds[10] = "commit"
+		cmds[11] = "pull"
+		cmds[12] = "push"
+
+
+		cmd = (cmds[i]+" ") or ""
+
+		@pendingCMD += cmd
+		console.log @pendingCMD
+
+		setTimeout (=> @set x,y,0,3), 300
+		setTimeout (=> @set x,y,0,0), 600

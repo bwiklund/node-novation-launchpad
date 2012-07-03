@@ -1,101 +1,88 @@
-#rad
-
-#utils
-array = (w,h,v) ->
-	[0...w].map -> [0...h].map -> v
+#!/usr/bin/env coffee
 
 class Diode
 	constructor: ->
+		@connectMidiPorts()
+		@clear()
+		setInterval @pulse, 1
+
+
+	connectMidiPorts: ->
 		@midi = require 'midi'
-		@mout = new @midi.output
-		@min = new @midi.input
+		@midiOut = new @midi.output
+		@midiIn = new @midi.input
 
 		process.on 'exit', =>
-			@mout.closePort()
-			@min.closePort()
+			@clear()
+			@midiOut.closePort()
+			@midiIn.closePort()
 
-		@min.openPort 0
-
-		[0...@mout.getPortCount()].map (i)=>
-			console.log @mout.getPortName(i)
-		console.log @mout.openPort(0);
-
-		@currentMode = new Memory this
-
-		@min.on 'message', (delta,msg) => 
+		@midiIn.openPort 0
+		@midiIn.on 'message', (delta,msg) => 
 			x = msg[1]%16
 			y = parseInt (msg[1]/16)
-			@currentMode.press x,y
-			
+			if msg[2] != 0
+				@onButtonDown(x,y)
 
-		
+		for i in [0...@midiOut.getPortCount()]
+			console.log "Port #{i}: " + @midiOut.getPortName(i)
+
+		#TODO: handle multiple midi ports and choose the right one
+		@midiOut.openPort(0);
 
 
+	onButtonDown: (x,y) ->
+		console.log "#{x} x #{y} pressed"
+		#todo: something neat
+		#@currentMode.press x,y,y*8+x
 
-		t = 0
-		pulse = =>
-			t++
-			for i in [0...64]
-				x = (i%8)
-				y = parseInt (i/8)
+
+	### some animation tests ###
+
+	# animated glowing thing
+	pulse: =>
+		@t ?= 0
+		@t++
+		for x in [0...8]
+			for y in [0...8]
 				color = @color parseInt(Math.random()*4), parseInt(Math.random()*4)
-				d = Math.sqrt( Math.pow(3.5-x,2) + Math.pow(3.5-y,2) )
-				red = 4-d / ( Math.sin(t/2) + 1)
-				green = 0#d / ( Math.sin(t/2) + 2)
+				dist = Math.sqrt( Math.pow(3.5-x,2) + Math.pow(3.5-y,2) )
+				red = 4-dist / ( Math.sin(@t/2) + 1)
+				green = dist / ( Math.sin(@t/2) + 2)
 				color = @color red,green
 
 				pos = @xy2i x,y
-				@mout.sendMessage [144,pos,color]
+				@midiOut.sendMessage [144,pos,color]
 
 
-		random = =>
-			for i in [0...64]
-				x = (i%8)
-				y = parseInt (i/8)
+	# random noise pattern
+	random: =>
+		for x in [0...8]
+			for y in [0...8]
 				color = @color parseInt(Math.random()*4), parseInt(Math.random()*4)
 				pos = @xy2i x,y
-				@mout.sendMessage [144,pos,color]
+				@midiOut.sendMessage [144,pos,color]
 
 
-		clear = =>
-			for i in [0...64]
-				x = (i%8)
-				y = parseInt (i/8)
+	# clear the screen
+	clear: =>
+		for x in [0...8]
+			for y in [0...8]
 				@set x,y,0,0
 
 
-		clear()
-		#setInterval random, 1
-
-
+	# convert XY coordinate to the midi index needed
 	xy2i: (x,y) -> 16 * (y%8) + x
+
+	# clamp a number into the int range needed for lighting up pixels
 	cRange: (c) -> parseInt Math.min( Math.max( 0,c ), 3 )
+
+	# get a color code
 	color: (red,green) -> 0b001100 + @cRange(red) + @cRange(green)*8
 
+	# set a pixel on the board
 	set: (x,y,r,g) ->
-		@mout.sendMessage [144,@xy2i(x,y),@color(r,g)]
-
-
-
-class Mode 
-	constructor: (@diode) ->
-	set: (args...) -> @diode.set args...
-
-class Basic extends Mode
-	press: (x,y) ->
-		@set x,y,3,3
-		setTimeout (=> @set x,y,0,3), 300
-		setTimeout (=> @set x,y,0,0), 600
-
-class Memory extends Mode
-	constructor: ->
-		@d = array 8,8,0
-
-	press: (x,y) ->
-		@set x,y,3,3
-		setTimeout (=> @set x,y,0,3), 300
-		setTimeout (=> @set x,y,0,0), 600
-
+		@midiOut.sendMessage [144,@xy2i(x,y),@color(r,g)]
 
 
 
@@ -105,6 +92,10 @@ process.stdin.resume()
 
 
 ###
+
+some stuff from the novation dev guide pdf
+
+
 Set grid LEDs
 Hex version 90h, Key, Velocity. 
 Decimal version 144, Key, Velocity.
