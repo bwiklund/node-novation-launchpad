@@ -9,7 +9,7 @@ npm install:
 It lets you treat the grid of LEDs as an 8x8 framebuffer, and animate them.
 
 ```
-launchpad = require('../lib/launchpad')()
+launchpad = require('launchpad')()
 
 noiseDemo = ->
   for x in [0...8]
