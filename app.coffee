@@ -11,8 +11,8 @@ class Launchpad
     @midiOut = new @midi.output
     @midiIn = new @midi.input
 
-    process.on 'SIGINT', -> @onExit()
-    @midiIn.on 'message', -> @onMidiEvent()
+    process.on 'SIGINT', => @onExit()
+    @midiIn.on 'message', => @onMidiEvent()
 
     @midiIn.openPort 0
     for i in [0...@midiOut.getPortCount()]
