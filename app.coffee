@@ -5,28 +5,28 @@ class Launchpad
     @initMidi()
     @clear()
 
-
   initMidi: ->
     @midi = require 'midi'
     @midiOut = new @midi.output
     @midiIn = new @midi.input
 
-    process.on 'SIGINT', => @onExit()
-    @midiIn.on 'message', => @onMidiEvent()
+    process.on 'SIGINT', @onExit
 
     @midiIn.openPort 0
+    @midiIn.on 'message', @onMidiEvent
+
     for i in [0...@midiOut.getPortCount()]
       console.log "Port #{i}: " + @midiOut.getPortName(i)
 
     #TODO: handle multiple midi ports and choose the right one
     @midiOut.openPort(0)
 
-  onExit: ->
+  onExit: =>
     # in case there's an error, this is ensured to happen
     setTimeout (-> process.exit()), 1000 
     @stopMidi()
 
-  onMidiEvent: (delta,msg) -> 
+  onMidiEvent: (delta,msg) => 
     x = msg[1]%16
     y = parseInt (msg[1]/16)
     if msg[2] != 0
@@ -70,12 +70,7 @@ class Launchpad
 
 
 # # random noise pattern
-# random: =>
-#   for x in [0...8]
-#     for y in [0...8]
-#       color = @color parseInt(Math.random()*4), parseInt(Math.random()*4)
-#       pos = @xy2i x,y
-#       @midiOut.sendMessage [144,pos,color]
+
 
 
 
@@ -85,7 +80,14 @@ class Launchpad
 
 lp = new Launchpad
 
-pulse = ->
+noiseDemo = ->
+  for x in [0...8]
+    for y in [0...8]
+      red =   ~~(Math.random()*4)
+      green = ~~(Math.random()*4)
+      lp.set x,y,red,green
+
+pulseDemo = ->
   @t ?= 0
   @t++
   for x in [0...8]
@@ -96,7 +98,7 @@ pulse = ->
       green = dist / ( Math.sin(@t/2) + 2)
       lp.set x,y,red,green
 
-setInterval pulse, 100
+setInterval noiseDemo, 100
 
 process.stdin.resume()
 
@@ -105,6 +107,7 @@ process.stdin.resume()
 
 some stuff from the novation dev guide pdf
 
+http://d19ulaff0trnck.cloudfront.net/sites/default/files/novation/downloads/4080/launchpad-programmers-reference.pdf
 
 Set grid LEDs
 Hex version 90h, Key, Velocity. 
