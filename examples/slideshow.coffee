@@ -35,5 +35,3 @@ allDemos = ->
     else pulseDemo()
 
 setInterval allDemos, 100
-
-process.stdin.resume()
