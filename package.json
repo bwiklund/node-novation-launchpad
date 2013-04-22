@@ -8,6 +8,7 @@
     "url": "git://github.com/benwiklund/coffeemidi.git"
   },
   "dependencies": {
-    "midi": "~0.7.0"
+    "midi": "~0.7.0",
+    "coffee-script": "~1.6.2"
   }
 }

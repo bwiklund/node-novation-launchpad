@@ -1,4 +1,4 @@
-lp = require('./launchpad')()
+lp = require('../index')()
 
 time = 0
 
