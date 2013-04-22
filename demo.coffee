@@ -17,7 +17,7 @@ pulseDemo = ->
       green = dist / ( Math.sin(time/2) + 2)
       lp.set x,y,red,green
 
-moireDemo = ->
+cubesDemo = ->
   for x in [0...8]
     for y in [0...8]
       red = 4
@@ -31,7 +31,7 @@ allDemos = ->
   phase = ~~((time % 60)/20)
   switch phase
     when 0 then noiseDemo()
-    when 1 then moireDemo()
+    when 1 then cubesDemo()
     else pulseDemo()
 
 setInterval allDemos, 100
