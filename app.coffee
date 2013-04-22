@@ -2,20 +2,21 @@
 
 class Launchpad
   constructor: ->
-    @connectMidiPorts()
+    @initMidi()
     @clear()
     setInterval @pulse, 1
 
 
-  connectMidiPorts: ->
+  initMidi: ->
     @midi = require 'midi'
     @midiOut = new @midi.output
     @midiIn = new @midi.input
 
-    process.on 'exit', =>
-      @clear()
-      @midiOut.closePort()
-      @midiIn.closePort()
+    process.on 'SIGINT', => 
+      setTimeout (-> process.exit()), 1000 # in case there's an error, this is ensured to happen
+      @stopMidi()
+      #process.exit()
+
 
     @midiIn.openPort 0
     @midiIn.on 'message', (delta,msg) => 
@@ -30,7 +31,14 @@ class Launchpad
       console.log "Port #{i}: " + @midiOut.getPortName(i)
 
     #TODO: handle multiple midi ports and choose the right one
-    @midiOut.openPort(0);
+    @midiOut.openPort(0)
+
+
+  stopMidi: ->
+    console.log "shutting down midi"
+    @clear()
+    @midiOut.closePort()
+    @midiIn.closePort()
 
 
   onButtonDown: (x,y) ->
@@ -39,6 +47,18 @@ class Launchpad
   onButtonUp: (x,y) ->
     console.log "#{x} x #{y} released"
 
+  # convert XY coordinate to the midi index needed
+  xy2i: (x,y) -> 16 * (y%8) + x
+
+  # clamp a number into the int range needed for lighting up pixels
+  cRange: (c) -> parseInt Math.min( Math.max( 0,c ), 3 )
+
+  # get a color code
+  color: (red,green) -> 0b001100 + @cRange(red) + @cRange(green)*8
+
+  # set a pixel on the board
+  set: (x,y,r,g) ->
+    @midiOut.sendMessage [144,@xy2i(x,y),@color(r,g)]
 
   ### some animation tests ###
 
@@ -74,18 +94,6 @@ class Launchpad
         @set x,y,0,0
 
 
-  # convert XY coordinate to the midi index needed
-  xy2i: (x,y) -> 16 * (y%8) + x
-
-  # clamp a number into the int range needed for lighting up pixels
-  cRange: (c) -> parseInt Math.min( Math.max( 0,c ), 3 )
-
-  # get a color code
-  color: (red,green) -> 0b001100 + @cRange(red) + @cRange(green)*8
-
-  # set a pixel on the board
-  set: (x,y,r,g) ->
-    @midiOut.sendMessage [144,@xy2i(x,y),@color(r,g)]
 
 
 
