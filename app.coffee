@@ -117,3 +117,5 @@ Green LED brightness.
 If 1: clear the other buffer’s copy of this LED. If 1: write this LED data to both buffers.
 Note: this behaviour overrides the Clear behaviour when both bits are set.
 Red LED brightness.
+
+###
