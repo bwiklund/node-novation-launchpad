@@ -1,6 +1,6 @@
 #!/usr/bin/env coffee
 
-class Diode
+class Launchpad
   constructor: ->
     @connectMidiPorts()
     @clear()
@@ -89,7 +89,7 @@ class Diode
 
 
 
-new Diode
+new Launchpad
 
 process.stdin.resume()
 
