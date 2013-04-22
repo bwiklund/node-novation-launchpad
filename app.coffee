@@ -11,34 +11,34 @@ class Launchpad
     @midiOut = new @midi.output
     @midiIn = new @midi.input
 
-    process.on 'SIGINT', => 
-      setTimeout (-> process.exit()), 1000 # in case there's an error, this is ensured to happen
-      @stopMidi()
-      #process.exit()
-
+    process.on 'SIGINT', -> @onExit()
+    @midiIn.on 'message', -> @onMidiEvent()
 
     @midiIn.openPort 0
-    @midiIn.on 'message', (delta,msg) => 
-      x = msg[1]%16
-      y = parseInt (msg[1]/16)
-      if msg[2] != 0
-        @onButtonDown(x,y)
-      else 
-        @onButtonUp(x,y)
-
     for i in [0...@midiOut.getPortCount()]
       console.log "Port #{i}: " + @midiOut.getPortName(i)
 
     #TODO: handle multiple midi ports and choose the right one
     @midiOut.openPort(0)
 
+  onExit: ->
+    # in case there's an error, this is ensured to happen
+    setTimeout (-> process.exit()), 1000 
+    @stopMidi()
+
+  onMidiEvent: (delta,msg) -> 
+    x = msg[1]%16
+    y = parseInt (msg[1]/16)
+    if msg[2] != 0
+      @onButtonDown(x,y)
+    else 
+      @onButtonUp(x,y)
 
   stopMidi: ->
     console.log "shutting down midi"
     @clear()
     @midiOut.closePort()
     @midiIn.closePort()
-
 
   onButtonDown: (x,y) ->
     console.log "#{x} x #{y} pressed"
