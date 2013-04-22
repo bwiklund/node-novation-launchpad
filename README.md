@@ -1,6 +1,8 @@
 node-novation-launchpad
 ===
 
+![Sample](https://raw.github.com/bwiklund/node-novation-launchpad/master/examples/video.gif)
+
 A nodejs wrapper for a Novation Launchpad.
 
 ```
