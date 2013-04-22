@@ -1,8 +1,8 @@
 {
-  "author": "Ben Wiklund <ben.wiklund@gmail.com>",
-  "name": "coffeepad",
-  "description": "some coffeescript for playing with a novation launchpad",
-  "version": "0.0.0",
+  "author": "Ben Wiklund <ben@daisyowl.com>",
+  "name": "launchpad",
+  "description": "a wrapper for the Novation Launchpad",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
     "url": "git://github.com/benwiklund/coffeemidi.git"
