@@ -4,7 +4,6 @@ class Launchpad
   constructor: ->
     @initMidi()
     @clear()
-    setInterval @pulse, 1
 
 
   initMidi: ->
@@ -60,34 +59,6 @@ class Launchpad
   set: (x,y,r,g) ->
     @midiOut.sendMessage [144,@xy2i(x,y),@color(r,g)]
 
-  ### some animation tests ###
-
-  # animated glowing thing
-  pulse: =>
-    @t ?= 0
-    @t++
-    for x in [0...8]
-      for y in [0...8]
-        color = @color parseInt(Math.random()*4), parseInt(Math.random()*4)
-        dist = Math.sqrt( Math.pow(3.5-x,2) + Math.pow(3.5-y,2) )
-        red = 4-dist / ( Math.sin(@t/2) + 1)
-        green = dist / ( Math.sin(@t/2) + 2)
-        color = @color red,green
-
-        pos = @xy2i x,y
-        @midiOut.sendMessage [144,pos,color]
-
-
-  # random noise pattern
-  random: =>
-    for x in [0...8]
-      for y in [0...8]
-        color = @color parseInt(Math.random()*4), parseInt(Math.random()*4)
-        pos = @xy2i x,y
-        @midiOut.sendMessage [144,pos,color]
-
-
-  # clear the screen
   clear: =>
     for x in [0...8]
       for y in [0...8]
@@ -95,9 +66,37 @@ class Launchpad
 
 
 
+  ### some animation tests ###
 
 
-new Launchpad
+# # random noise pattern
+# random: =>
+#   for x in [0...8]
+#     for y in [0...8]
+#       color = @color parseInt(Math.random()*4), parseInt(Math.random()*4)
+#       pos = @xy2i x,y
+#       @midiOut.sendMessage [144,pos,color]
+
+
+
+
+
+
+
+lp = new Launchpad
+
+pulse = ->
+  @t ?= 0
+  @t++
+  for x in [0...8]
+    for y in [0...8]
+      #color = @lp.color parseInt(Math.random()*4), parseInt(Math.random()*4)
+      dist = Math.sqrt( Math.pow(3.5-x,2) + Math.pow(3.5-y,2) )
+      red = 4-dist / ( Math.sin(@t/2) + 1)
+      green = dist / ( Math.sin(@t/2) + 2)
+      lp.set x,y,red,green
+
+setInterval pulse, 100
 
 process.stdin.resume()
 
