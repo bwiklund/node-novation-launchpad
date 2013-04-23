@@ -11,7 +11,7 @@ npm install git://github.com/bwiklund/node-novation-launchpad.git
 
 It lets you treat the grid of LEDs as an 8x8 framebuffer, and animate them.
 
-```
+```coffeescript
 launchpad = require('launchpad')()
 
 noiseDemo = ->
