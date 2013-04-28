@@ -1,6 +1,6 @@
 {
   "author": "Ben Wiklund <ben@daisyowl.com>",
-  "name": "launchpad",
+  "name": "novation-launchpad",
   "description": "a wrapper for the Novation Launchpad",
   "version": "0.0.1",
   "repository": {
