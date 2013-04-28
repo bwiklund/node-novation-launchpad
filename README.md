@@ -6,7 +6,7 @@ node-novation-launchpad
 A nodejs wrapper for a Novation Launchpad.
 
 ```
-npm install git://github.com/bwiklund/node-novation-launchpad.git
+npm install novation-launchpad
 ```
 
 It lets you treat the grid of LEDs as an 8x8 framebuffer, and animate them.
