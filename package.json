@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git://github.com/benwiklund/coffeemidi.git"
+    "url": "git://github.com/bwiklund/node-novation-launchpad.git"
   },
   "dependencies": {
     "midi": "~0.7.0",
