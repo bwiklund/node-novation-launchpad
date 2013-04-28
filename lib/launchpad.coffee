@@ -39,10 +39,8 @@ class Launchpad
     @midiIn.closePort()
 
   onButtonDown: (x,y) ->
-    console.log "#{x} x #{y} pressed"
   
   onButtonUp: (x,y) ->
-    console.log "#{x} x #{y} released"
 
   # convert XY coordinate to the midi index needed
   xy2i: (x,y) -> 16 * (y%8) + x
