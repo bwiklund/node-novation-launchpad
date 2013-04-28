@@ -2,7 +2,7 @@
   "author": "Ben Wiklund <ben@daisyowl.com>",
   "name": "novation-launchpad",
   "description": "a wrapper for the Novation Launchpad",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "git://github.com/bwiklund/node-novation-launchpad.git"
