@@ -15,12 +15,10 @@ class Launchpad
     @port=-1
     for i in [0...@midiOut.getPortCount()]
       console.log "Port #{i}: " + @midiOut.getPortName(i)
-      if @port=="Launchpad"|"Launchpad:0"
+      if @midiOut.getPortName(i)=="Launchpad"||"Launchpad:0"
         @port=i
     if @port==-1
       throw "Launchpad was not detected"
-    
-    @midiOut.openPort(@port)
 
   onExit: =>
     # in case there's an error, this is ensured to happen
