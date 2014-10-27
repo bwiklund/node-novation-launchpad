@@ -19,6 +19,7 @@ class Launchpad
         @port=i
     if @port==-1
       throw "Launchpad was not detected"
+    @midiOut.openPort(@port)
 
   onExit: =>
     # in case there's an error, this is ensured to happen
