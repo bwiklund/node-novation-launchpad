@@ -7,4 +7,4 @@ noiseDemo = ->
       green = ~~(Math.random()*4)
       launchpad.set x,y,red,green
 
-setInterval noiseDemo, 100
+setInterval noiseDemo, 200

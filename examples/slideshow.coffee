@@ -34,4 +34,4 @@ allDemos = ->
     when 1 then cubesDemo()
     else pulseDemo()
 
-setInterval allDemos, 100
+setInterval allDemos, 200
