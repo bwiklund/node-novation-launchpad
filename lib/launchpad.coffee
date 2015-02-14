@@ -15,23 +15,23 @@ class Launchpad
     @port=-1
     for i in [0...@midiOut.getPortCount()]
       console.log "Port #{i}: " + @midiOut.getPortName(i)
-      if @midiOut.getPortName(i)=="Launchpad"||"Launchpad:0"
-        @port=i
+      switch @midiOut.getPortName(i)
+        when "Launchpad", "Launchpad:0" then @port=i
     if @port==-1
       throw "Launchpad was not detected"
     @midiOut.openPort(@port)
 
   onExit: =>
     # in case there's an error, this is ensured to happen
-    setTimeout (-> process.exit()), 1000 
+    setTimeout (-> process.exit()), 1000
     @stopMidi()
 
-  onMidiEvent: (delta,msg) => 
+  onMidiEvent: (delta,msg) =>
     x = msg[1]%16
     y = parseInt (msg[1]/16)
     if msg[2] != 0
       @onButtonDown(x,y)
-    else 
+    else
       @onButtonUp(x,y)
 
   stopMidi: ->
@@ -41,7 +41,7 @@ class Launchpad
     @midiIn.closePort()
 
   onButtonDown: (x,y) ->
-  
+
   onButtonUp: (x,y) ->
 
   # convert XY coordinate to the midi index needed
